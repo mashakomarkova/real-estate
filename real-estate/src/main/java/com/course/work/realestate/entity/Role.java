@@ -1,13 +1,14 @@
 package com.course.work.realestate.entity;
 
+import lombok.Data;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.Objects;
 
 @Entity
-public class District {
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -36,23 +37,5 @@ public class District {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object objDistrict) {
-        if (this == objDistrict) {
-            return true;
-        }
-        if (objDistrict == null || getClass() != objDistrict.getClass()) {
-            return false;
-        }
-        District district = (District) objDistrict;
-        return Objects.equals(id, district.id) &&
-                Objects.equals(name, district.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
     }
 }
