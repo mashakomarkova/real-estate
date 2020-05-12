@@ -4,12 +4,13 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 public class Property {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @ManyToOne
     private District district;
@@ -18,6 +19,10 @@ public class Property {
     private String type;
     private double area;
     private String description;
+    @ManyToOne
+    private User realtor;
+    @OneToMany
+    private List<Deal> deals;
 
     public Long getId() {
         return id;
@@ -73,5 +78,21 @@ public class Property {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Deal> getDeals() {
+        return deals;
+    }
+
+    public void setDeals(List<Deal> deals) {
+        this.deals = deals;
+    }
+
+    public User getRealtor() {
+        return realtor;
+    }
+
+    public void setRealtor(User realtor) {
+        this.realtor = realtor;
     }
 }

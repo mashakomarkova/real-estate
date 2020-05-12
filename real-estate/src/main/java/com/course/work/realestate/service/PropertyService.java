@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PropertyService {
     List<Property> findPropertiesByFilters(Integer numberOfRooms, District district, Double priceFrom, Double priceTo);
+    List<Property> findAllProperties();
+    Property findPropertyById(Long id);
 }

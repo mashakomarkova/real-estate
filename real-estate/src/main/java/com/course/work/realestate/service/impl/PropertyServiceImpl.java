@@ -41,4 +41,14 @@ public class PropertyServiceImpl implements PropertyService {
         };
         return propertyRepository.findAll(specification);
     }
+
+    @Override
+    public List<Property> findAllProperties() {
+        return propertyRepository.findAll();
+    }
+
+    @Override
+    public Property findPropertyById(Long id) {
+        return propertyRepository.findById(id).get();
+    }
 }

@@ -10,12 +10,10 @@ import java.sql.Date;
 public class Deal {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @ManyToOne
     private User client;
-    @ManyToOne
-    private User realtor;
     @ManyToOne
     private Property property;
     private Date dateOfDeal;
@@ -38,14 +36,6 @@ public class Deal {
 
     public void setClient(User client) {
         this.client = client;
-    }
-
-    public User getRealtor() {
-        return realtor;
-    }
-
-    public void setRealtor(User realtor) {
-        this.realtor = realtor;
     }
 
     public Property getProperty() {
