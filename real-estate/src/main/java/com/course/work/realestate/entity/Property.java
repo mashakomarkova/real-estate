@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity
-public class Property {
+public class Property implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -94,5 +94,20 @@ public class Property {
 
     public void setRealtor(User realtor) {
         this.realtor = realtor;
+    }
+
+    @Override
+    public String toString() {
+        return "Property{" +
+                "id=" + id +
+                ", district=" + district +
+                ", numberOfRooms=" + numberOfRooms +
+                ", price=" + price +
+                ", type='" + type + '\'' +
+                ", area=" + area +
+                ", description='" + description + '\'' +
+                ", realtor=" + realtor +
+                ", deals=" + deals +
+                '}';
     }
 }

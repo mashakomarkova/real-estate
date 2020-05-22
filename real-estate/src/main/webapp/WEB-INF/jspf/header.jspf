@@ -14,5 +14,23 @@
         <li>
             <a href="${pageContext.request.contextPath}/">My account</a>
         </li>
+        <li>
+            <a href="${pageContext.request.contextPath}/filterProperty">Properties</a>
+        </li>
+        <c:if test="${user.role.name eq 'realtor'}">
+
+            <li>
+                <a href="${pageContext.request.contextPath}/propertyManagement">Property Management</a>
+            </li>
+
+        </c:if>
+        <c:if test="${user.role.name eq 'client'}">
+            <li>
+                <a href="${pageContext.request.contextPath}/bookings">My bookings</a>
+            </li>
+        </c:if>
+        <li>
+            <a href="${pageContext.request.contextPath}/logout">Logout</a>
+        </li>
     </c:if>
 </ul>

@@ -7,23 +7,21 @@
 </head>
 <body>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
-
+Договор аренды<br>
 Количество комнат - ${property.numberOfRooms}<br>
 Цена за ночь - ${property.price}<br>
 Тип - ${property.type}<br>
 Общая площадь - ${property.area}<br>
 Описание - ${property.description}<br>
 Район - ${property.district}<br>
+Дата заезда - ${arrivalDate}<br>
+Дата отъезда - ${departureDate}<br>
 <br>
 <form action="${pageContext.request.contextPath}/bookProperty" method="post">
-    <label>Arrival Date
-        <input type="date" name="arrivalDate">
-    </label>
-    <label>Departure Date
-        <input type="date" name="departureDate">
-    </label>
+    <input type="hidden" name="arrivalDate" value="${arrivalDate}" />
+    <input type="hidden" name="departureDate" value="${departureDate}" />
     <input type="hidden" name="propertyId" value="${property.id}">
-    <button type="submit">Book</button>
+    <button type="submit">Подтвердить</button>
 </form>
 </body>
 </html>

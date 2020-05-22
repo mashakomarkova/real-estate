@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.sql.Date;
 
 @Entity
-public class Deal {
+public class Deal implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -85,4 +85,5 @@ public class Deal {
     public void setStatus(String status) {
         this.status = status;
     }
+
 }

@@ -1,14 +1,23 @@
 package com.course.work.realestate.service.impl;
 
+import com.course.work.realestate.entity.Deal;
 import com.course.work.realestate.entity.District;
 import com.course.work.realestate.entity.Property;
+import com.course.work.realestate.entity.User;
 import com.course.work.realestate.repository.PropertyRepository;
 import com.course.work.realestate.service.PropertyService;
-import com.course.work.realestate.specification.PropertySpecification;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +45,12 @@ public class PropertyServiceImpl implements PropertyService {
                 if (priceTo != null && priceFrom != null) {
                     predicates.add(builder.between(root.get("price"), priceFrom, priceTo));
                 }
+                if (priceTo != null && priceFrom == null) {
+                    predicates.add(builder.lessThanOrEqualTo(root.get("price"), priceTo));
+                }
+                if (priceTo == null && priceFrom != null) {
+                    predicates.add(builder.greaterThanOrEqualTo(root.get("price"), priceFrom));
+                }
                 return builder.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         };
@@ -48,7 +63,108 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    public List<Property> findPropertiesByRealtor(User user) {
+        return propertyRepository.findAllByRealtor(user);
+    }
+
+    @Override
     public Property findPropertyById(Long id) {
         return propertyRepository.findById(id).get();
+    }
+
+    @Override
+    public void deleteProperty(Long id) {
+        propertyRepository.deleteById(id);
+    }
+
+    @Override
+    public void saveProperty(Property property) {
+        propertyRepository.save(property);
+    }
+
+    @Override
+    public void saveReport(Property property, int totalDeals, double totalProfit) {
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("Report");
+        int rownum = 0;
+        Cell cell;
+        Row row;
+        row = sheet.createRow(rownum);
+        cell = row.createCell(0, CellType.STRING);
+        cell.setCellValue("client username");
+        // EmpName
+        cell = row.createCell(1, CellType.STRING);
+        cell.setCellValue("client first name");
+        // Salary
+        cell = row.createCell(2, CellType.STRING);
+        cell.setCellValue("client last name");
+        // Grade
+        cell = row.createCell(3, CellType.STRING);
+        cell.setCellValue("client phone number");
+        // Bonus
+        cell = row.createCell(4, CellType.STRING);
+        cell.setCellValue("dateOfDeal");
+
+        cell = row.createCell(5, CellType.STRING);
+        cell.setCellValue("totalPrice");
+
+        cell = row.createCell(6, CellType.STRING);
+        cell.setCellValue("arrivalDate");
+
+        cell = row.createCell(7, CellType.STRING);
+        cell.setCellValue("departureDate");
+
+        cell = row.createCell(8, CellType.STRING);
+        cell.setCellValue("status");
+
+        // Data
+        for (Deal deal : property.getDeals()) {
+            rownum++;
+            row = sheet.createRow(rownum);
+
+            // EmpNo (A)
+            cell = row.createCell(0, CellType.STRING);
+            cell.setCellValue(deal.getClient().getUsername());
+            // EmpName (B)
+            cell = row.createCell(1, CellType.STRING);
+            cell.setCellValue(deal.getClient().getFirstName());
+            // Salary (C)
+            cell = row.createCell(2, CellType.STRING);
+            cell.setCellValue(deal.getClient().getLastName());
+            // Grade (D)
+            cell = row.createCell(3, CellType.STRING);
+            cell.setCellValue(deal.getClient().getPhoneNumber());
+            // Bonus (E)
+            cell = row.createCell(4, CellType.STRING);
+            cell.setCellValue(deal.getDateOfDeal().toString());
+
+            cell = row.createCell(5, CellType.NUMERIC);
+            cell.setCellValue(deal.getTotalPrice());
+
+            cell = row.createCell(6, CellType.STRING);
+            cell.setCellValue(deal.getArrivalDate().toString());
+
+            cell = row.createCell(7, CellType.STRING);
+            cell.setCellValue(deal.getDepartureDate().toString());
+
+            cell = row.createCell(8, CellType.STRING);
+            cell.setCellValue(deal.getStatus());
+        }
+        cell = row.createCell(0, CellType.STRING);
+        cell.setCellValue(totalDeals);
+        cell = row.createCell(1, CellType.STRING);
+        cell.setCellValue("status");
+        cell = row.createCell(0, CellType.STRING);
+        cell.setCellValue(totalProfit);
+        cell = row.createCell(1, CellType.STRING);
+        cell.setCellValue("profit");
+        File file = new File("deals.xls");
+
+        try {
+            FileOutputStream outFile = new FileOutputStream(file);
+            workbook.write(outFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

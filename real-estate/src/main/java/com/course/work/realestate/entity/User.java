@@ -1,9 +1,13 @@
 package com.course.work.realestate.entity;
 
+import org.springframework.context.annotation.Scope;
+
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
-public class User {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -71,5 +75,41 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public boolean equals(Object oUser) {
+        if (this == oUser) {
+            return true;
+        }
+        if (oUser == null || getClass() != oUser.getClass()) {
+            return false;
+        }
+        User user = (User) oUser;
+        return Objects.equals(id, user.id) &&
+                Objects.equals(username, user.username) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(firstName, user.firstName) &&
+                Objects.equals(lastName, user.lastName) &&
+                Objects.equals(phoneNumber, user.phoneNumber) &&
+                Objects.equals(role, user.role);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, password, firstName, lastName, phoneNumber, role);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", role=" + role +
+                '}';
     }
 }
