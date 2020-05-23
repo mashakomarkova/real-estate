@@ -8,10 +8,17 @@ import java.util.List;
 
 public interface PropertyService {
     List<Property> findPropertiesByFilters(Integer numberOfRooms, District district, Double priceFrom, Double priceTo);
+
     List<Property> findAllProperties();
+
     List<Property> findPropertiesByRealtor(User user);
+
     Property findPropertyById(Long id);
+
     void deleteProperty(Long id);
+
     void saveProperty(Property property);
-    void saveReport(Property property, int totalDeals, double totalProfit);
+
+    void saveReport(Property property, int totalCompletedDealsJson, int totalCanceledDealsJson, int totalActiveDeals,
+                    double totalProfit);
 }

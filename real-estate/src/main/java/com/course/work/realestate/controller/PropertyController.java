@@ -1,5 +1,6 @@
 package com.course.work.realestate.controller;
 
+import com.course.work.realestate.constant.Constant;
 import com.course.work.realestate.entity.Deal;
 import com.course.work.realestate.entity.District;
 import com.course.work.realestate.entity.Property;
@@ -42,19 +43,52 @@ public class PropertyController {
         return modelAndView;
     }
 
-    @PostMapping("/filterProperty")
-    public ModelAndView filterProperty(@RequestParam String district, @RequestParam String numberOfRooms,
-                                       @RequestParam String priceFrom, @RequestParam String priceTo) {
-
+    @PostMapping("/searchProperty")
+    public ModelAndView searchPropertyByDate(@RequestParam String arrivalDate, @RequestParam String departureDate,
+                                             @RequestParam String district, @RequestParam String numberOfRooms,
+                                             @RequestParam String priceFrom, @RequestParam String priceTo) {
+        Date arrivalDateOfOccupation = Date.valueOf(arrivalDate);
+        Date departureDateOfOccupation = Date.valueOf(departureDate);
         ModelAndView modelAndView = new ModelAndView("propertySearcher");
         modelAndView.addObject("districts", districtService.findAllDistricts());
-        modelAndView.addObject("properties", propertyService.findPropertiesByFilters(
-                !numberOfRooms.isEmpty() ? Integer.parseInt(numberOfRooms) : null,
-                !district.isEmpty() ? new Gson().fromJson(district, District.class) : null,
-                !priceFrom.isEmpty() ? Double.parseDouble(priceFrom) : null,
-                !priceTo.isEmpty() ? Double.parseDouble(priceTo) : null
-        ));
-        return modelAndView;
+        if (!areDatesValid(arrivalDateOfOccupation, departureDateOfOccupation)) {
+            modelAndView.addObject("error", "Дата прибытия не может быть позже даты высоления");
+            return modelAndView;
+        } else {
+            List<Property> properties = propertyService.findPropertiesByFilters(
+                    !numberOfRooms.isEmpty() ? Integer.parseInt(numberOfRooms) : null,
+                    !district.isEmpty() ? new Gson().fromJson(district, District.class) : null,
+                    !priceFrom.isEmpty() ? Double.parseDouble(priceFrom) : null,
+                    !priceTo.isEmpty() ? Double.parseDouble(priceTo) : null
+            );
+            Map<Long, Boolean> busyEstateMap = new HashMap<>();
+            for (Iterator<Property> it = properties.iterator(); it.hasNext(); ) {
+                Property property = it.next();
+                for (Deal deal : property.getDeals()) {
+                    if (!(arrivalDateOfOccupation.getTime() <= deal.getArrivalDate().getTime()
+                            && departureDateOfOccupation.getTime() <= deal.getArrivalDate().getTime()
+                            || arrivalDateOfOccupation.getTime() >= deal.getDepartureDate().getTime()
+                            && departureDateOfOccupation.getTime() > arrivalDateOfOccupation.getTime())) {
+                        if (deal.getStatus().equals(Constant.STATUS_CANCELED)) {
+                            busyEstateMap.put(property.getId(), false);
+                        } else {
+                            busyEstateMap.put(property.getId(), true);
+                        }
+                    } else {
+                        busyEstateMap.put(property.getId(), false);
+                    }
+                }
+            }
+            modelAndView.addObject("properties", properties);
+            modelAndView.addObject("arrivalDate", arrivalDate);
+            modelAndView.addObject("departureDate", departureDate);
+            modelAndView.addObject("busyEstateMap", busyEstateMap);
+            return modelAndView;
+        }
+    }
+
+    private boolean areDatesValid(Date arrivalDate, Date departureDate) {
+        return arrivalDate.before(departureDate);
     }
 
     @PostMapping("/bookProperty")
@@ -72,7 +106,22 @@ public class PropertyController {
         ModelAndView modelAndView = new ModelAndView("bookings");
         modelAndView.addObject("deals", dealService.findDealsByClient(
                 (User) request.getSession().getAttribute("user")));
+        return modelAndView;
+    }
 
+    @GetMapping("/cancelBooking/{id}")
+    public ModelAndView cancelBooking(@PathVariable String id) {
+        ModelAndView modelAndView = new ModelAndView("redirect:/bookings");
+        Deal deal = dealService.findDealById(Long.parseLong(id));
+        Date today = new Date(System.currentTimeMillis());
+        if (deal.getArrivalDate().before(today) && deal.getDepartureDate().before(today)
+                || deal.getStatus().equals(Constant.STATUS_CANCELED)
+                || deal.getStatus().equals(Constant.STATUS_COMPLETED)) {
+            modelAndView.addObject("incorrect", "Вы не можете отменить эту сделку");
+        } else {
+            deal.setStatus(Constant.STATUS_CANCELED);
+            dealService.saveDeal(deal);
+        }
         return modelAndView;
     }
 
@@ -85,7 +134,7 @@ public class PropertyController {
         deal.setDateOfDeal(Date.valueOf(LocalDate.now()));
         User client = (User) request.getSession().getAttribute("user");
         deal.setClient(client);
-        deal.setStatus("accepted");
+        deal.setStatus(Constant.STATUS_ACCEPTED);
         Property property = propertyService.findPropertyById(Long.parseLong(propertyId));
         property.getDeals().add(deal);
         deal.setProperty(property);
@@ -127,8 +176,14 @@ public class PropertyController {
         modelAndView.addObject("districts", districtService.findAllDistricts());
         Property property = propertyService.findPropertyById(id);
         modelAndView.addObject("property", property);
-        modelAndView.addObject("totalDeals", property.getDeals().size());
+        modelAndView.addObject("totalCompletedDeals", (int) property.getDeals()
+                .stream().filter(deal -> deal.getStatus().equals(Constant.STATUS_COMPLETED)).count());
+        modelAndView.addObject("totalCanceledDeals", (int) property.getDeals()
+                .stream().filter(deal -> deal.getStatus().equals(Constant.STATUS_CANCELED)).count());
+        modelAndView.addObject("totalActiveDeals", (int) property.getDeals()
+                .stream().filter(deal -> deal.getStatus().equals(Constant.STATUS_ACCEPTED)).count());
         modelAndView.addObject("totalProfit", property.getDeals().stream()
+                .filter(deal -> deal.getStatus().equals(Constant.STATUS_COMPLETED))
                 .mapToDouble(Deal::getTotalPrice)
                 .sum()
         );
@@ -171,39 +226,19 @@ public class PropertyController {
         propertyService.saveProperty(property);
         return modelAndView;
     }
+
     @PostMapping("/saveReport")
-    public ModelAndView saveReport(@RequestParam String id, @RequestParam String property,
-                                   @RequestParam String totalDeals, @RequestParam String totalProfit) {
+    public ModelAndView saveReport(@RequestParam String id, @RequestParam String totalCompletedDeals,
+                                   @RequestParam String totalCanceledDeals, @RequestParam String totalActiveDeals,
+                                   @RequestParam String totalProfit) {
         ModelAndView modelAndView = new ModelAndView("redirect:/detailsProperty/" + id);
-        Property propertyJson =propertyService.findPropertyById(Long.parseLong(id));
-        int totalDealsJson = Integer.parseInt(totalDeals);
+        Property propertyJson = propertyService.findPropertyById(Long.parseLong(id));
+        int totalCompletedDealsJson = Integer.parseInt(totalCompletedDeals);
+        int totalCanceledDealsJson = Integer.parseInt(totalCanceledDeals);
+        int totalActiveDealsJson = Integer.parseInt(totalActiveDeals);
         double totalProfitJson = Double.parseDouble(totalProfit);
-        propertyService.saveReport(propertyJson, totalDealsJson, totalProfitJson);
-        return modelAndView;
-    }
-    @PostMapping("/searchProperty")
-    public ModelAndView searchPropertyByDate(@RequestParam String arrivalDate, @RequestParam String departureDate) {
-        Date arrivalDateOfOccupation = Date.valueOf(arrivalDate);
-        Date departureDateOfOccupation = Date.valueOf(departureDate);
-        List<Property> properties = propertyService.findAllProperties();
-        for (Iterator<Property> it = properties.iterator(); it.hasNext(); ) {
-            Property property = it.next();
-            for (Deal deal : property.getDeals()) {
-                if (!(arrivalDateOfOccupation.getTime() <= deal.getArrivalDate().getTime()
-                        && departureDateOfOccupation.getTime() <= deal.getArrivalDate().getTime()
-                        || arrivalDateOfOccupation.getTime() >= deal.getDepartureDate().getTime()
-                        && departureDateOfOccupation.getTime() > arrivalDateOfOccupation.getTime())) {
-                    it.remove();
-                }
-            }
-        }
-        ModelAndView modelAndView = new ModelAndView("propertySearcher");
-        modelAndView.addObject("districts", districtService.findAllDistricts());
-        modelAndView.addObject("properties", properties);
-        modelAndView.addObject("arrivalDate", arrivalDate);
-        modelAndView.addObject("departureDate", departureDate);
-        Map<Long, Boolean> busyEstateMap = getBusyEstateMap(properties, departureDateOfOccupation);
-        modelAndView.addObject("busyEstateMap", busyEstateMap);
+        propertyService.saveReport(propertyJson, totalCompletedDealsJson, totalCanceledDealsJson,
+                totalActiveDealsJson, totalProfitJson);
         return modelAndView;
     }
 

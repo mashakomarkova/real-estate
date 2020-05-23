@@ -26,4 +26,9 @@ public class DealServiceImpl implements DealService {
     public List<Deal> findDealsByClient(User client) {
         return dealRepository.findAllByClient(client);
     }
+
+    @Override
+    public Deal findDealById(Long id) {
+        return dealRepository.findById(id).get();
+    }
 }

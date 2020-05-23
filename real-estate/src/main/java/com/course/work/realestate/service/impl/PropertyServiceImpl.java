@@ -83,7 +83,8 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public void saveReport(Property property, int totalDeals, double totalProfit) {
+    public void saveReport(Property property, int totalCompletedDealsJson, int totalCanceledDealsJson, int totalActiveDeals,
+                           double totalProfit) {
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("Report");
         int rownum = 0;
@@ -117,24 +118,22 @@ public class PropertyServiceImpl implements PropertyService {
         cell = row.createCell(8, CellType.STRING);
         cell.setCellValue("status");
 
-        // Data
         for (Deal deal : property.getDeals()) {
             rownum++;
             row = sheet.createRow(rownum);
 
-            // EmpNo (A)
             cell = row.createCell(0, CellType.STRING);
             cell.setCellValue(deal.getClient().getUsername());
-            // EmpName (B)
+
             cell = row.createCell(1, CellType.STRING);
             cell.setCellValue(deal.getClient().getFirstName());
-            // Salary (C)
+
             cell = row.createCell(2, CellType.STRING);
             cell.setCellValue(deal.getClient().getLastName());
-            // Grade (D)
+
             cell = row.createCell(3, CellType.STRING);
             cell.setCellValue(deal.getClient().getPhoneNumber());
-            // Bonus (E)
+
             cell = row.createCell(4, CellType.STRING);
             cell.setCellValue(deal.getDateOfDeal().toString());
 
@@ -150,14 +149,36 @@ public class PropertyServiceImpl implements PropertyService {
             cell = row.createCell(8, CellType.STRING);
             cell.setCellValue(deal.getStatus());
         }
+        rownum++;
+
+        row = sheet.createRow(rownum);
         cell = row.createCell(0, CellType.STRING);
-        cell.setCellValue(totalDeals);
+        cell.setCellValue("total completed deals");
+
         cell = row.createCell(1, CellType.STRING);
-        cell.setCellValue("status");
-        cell = row.createCell(0, CellType.STRING);
-        cell.setCellValue(totalProfit);
-        cell = row.createCell(1, CellType.STRING);
+        cell.setCellValue("total cancelled deals");
+
+        cell = row.createCell(2, CellType.STRING);
+        cell.setCellValue("total active deals");
+
+        cell = row.createCell(3, CellType.STRING);
         cell.setCellValue("profit");
+
+        rownum++;
+
+        row = sheet.createRow(rownum);
+        cell = row.createCell(0, CellType.STRING);
+        cell.setCellValue(totalCompletedDealsJson);
+
+        cell = row.createCell(1, CellType.STRING);
+        cell.setCellValue(totalCanceledDealsJson);
+
+        cell = row.createCell(2, CellType.STRING);
+        cell.setCellValue(totalActiveDeals);
+
+        cell = row.createCell(3, CellType.STRING);
+        cell.setCellValue(totalProfit);
+
         File file = new File("deals.xls");
 
         try {

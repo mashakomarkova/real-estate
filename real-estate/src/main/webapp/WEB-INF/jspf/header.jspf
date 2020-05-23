@@ -1,36 +1,41 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<ul>
-    <c:if test="${empty user}">
-        <li>
-            <a href="${pageContext.request.contextPath}/logIn">Login</a>
-        </li>
-        <li>
-            <a href="${pageContext.request.contextPath}/register">Register</a>
-        </li>
-    </c:if>
-    <c:if test="${not empty user}">
-        <li>
-            <a href="${pageContext.request.contextPath}/">My account</a>
-        </li>
-        <li>
-            <a href="${pageContext.request.contextPath}/filterProperty">Properties</a>
-        </li>
-        <c:if test="${user.role.name eq 'realtor'}">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <c:if test="${empty user}">
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/logIn">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/register">Register</a>
+                </li>
+            </c:if>
+            <c:if test="${not empty user}">
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/">My account</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/filterProperty">Properties</a>
+                </li>
+                <c:if test="${user.role.name eq 'realtor'}">
 
-            <li>
-                <a href="${pageContext.request.contextPath}/propertyManagement">Property Management</a>
-            </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/propertyManagement">Property
+                            Management</a>
+                    </li>
 
-        </c:if>
-        <c:if test="${user.role.name eq 'client'}">
-            <li>
-                <a href="${pageContext.request.contextPath}/bookings">My bookings</a>
-            </li>
-        </c:if>
-        <li>
-            <a href="${pageContext.request.contextPath}/logout">Logout</a>
-        </li>
-    </c:if>
-</ul>
+                </c:if>
+                <c:if test="${user.role.name eq 'client'}">
+                    <li class="nav-item">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/bookings">My bookings</a>
+                    </li>
+                </c:if>
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/logout">Logout</a>
+                </li>
+            </c:if>
+        </ul>
+    </div>
+</nav>

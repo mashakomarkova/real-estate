@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/jspf/taglib.jspf" %>
+
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
@@ -7,21 +9,28 @@
 </head>
 <body>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
-Договор аренды<br>
-Количество комнат - ${property.numberOfRooms}<br>
-Цена за ночь - ${property.price}<br>
-Тип - ${property.type}<br>
-Общая площадь - ${property.area}<br>
-Описание - ${property.description}<br>
-Район - ${property.district}<br>
-Дата заезда - ${arrivalDate}<br>
-Дата отъезда - ${departureDate}<br>
-<br>
-<form action="${pageContext.request.contextPath}/bookProperty" method="post">
-    <input type="hidden" name="arrivalDate" value="${arrivalDate}" />
-    <input type="hidden" name="departureDate" value="${departureDate}" />
-    <input type="hidden" name="propertyId" value="${property.id}">
-    <button type="submit">Подтвердить</button>
-</form>
+<div class="container">
+    <div class="card text-center">
+        <div class="card-header">
+            Договор аренды
+        </div>
+        <div class="card-body">
+            <h5 class="card-title"> Цена за ночь - ${property.price}</h5>
+            <p class="card-text">Количество комнат - ${property.numberOfRooms}</p>
+            <p class="card-text">Тип - ${property.type}</p>
+            <p class="card-text">Общая площадь - ${property.area}</p>
+            <p class="card-text">Описание - ${property.description}</p>
+            <p class="card-text">Район - ${property.district.name}</p>
+            <p class="card-text">Дата заезда - ${arrivalDate}</p>
+            <p class="card-text">Дата отъезда - ${departureDate}</p>
+        </div>
+        <form action="${pageContext.request.contextPath}/bookProperty" method="post">
+            <input type="hidden" name="arrivalDate" value="${arrivalDate}"/>
+            <input type="hidden" name="departureDate" value="${departureDate}"/>
+            <input type="hidden" name="propertyId" value="${property.id}">
+            <button type="submit"  class="btn btn-primary">Подтвердить</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
