@@ -37,6 +37,7 @@ public class AuthozizationFilter implements Filter {
         }
 
     }
+
     private boolean accessAllowed(ServletRequest request) {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String commandName = ((HttpServletRequest) request).getRequestURI();
@@ -45,7 +46,7 @@ public class AuthozizationFilter implements Filter {
             return false;
         }
         int count = 0;
-        for (int i = 0; i< commandName.length(); i++) {
+        for (int i = 0; i < commandName.length(); i++) {
             if (commandName.charAt(i) == '/') {
                 count++;
             }
@@ -62,11 +63,11 @@ public class AuthozizationFilter implements Filter {
             return false;
         }
         User user = (User) session.getAttribute("user");
-        Role userRole = user.getRole();
+        Role userRole = user != null ? user.getRole() : null;
         if (userRole == null) {
             return false;
         }
-        System.out.println(session.getAttribute("userRole"));
+
         System.out.println(accessMap.get(userRole.getName()).contains(commandName));
         System.out.println(commons.contains(commandName));
         System.out.println(accessMap);

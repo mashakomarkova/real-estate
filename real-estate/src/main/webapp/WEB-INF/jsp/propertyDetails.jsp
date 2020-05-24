@@ -7,7 +7,7 @@
 
 <html>
 <head>
-    <title>#[[$Title$]]#</title>
+    <title>Property details</title>
 </head>
 <body>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>

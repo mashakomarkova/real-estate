@@ -13,7 +13,7 @@
 <% SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");%>
 <html>
 <head>
-    <title>#[[$Title$]]#</title>
+    <title>Searcher</title>
 </head>
 <body>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
@@ -83,18 +83,20 @@
                 <th>${property.type}</th>
                 <th>${property.area}</th>
                 <th>${property.description}</th>
-                <c:choose>
-                    <c:when test="${busyEstateMap[property.id] eq true}">
-                        <th>busy</th>
-                    </c:when>
-                    <c:otherwise>
-                        <th>
-                            <a href="/propertyById/${property.id}?arrivalDate=${arrivalDate}&departureDate=${departureDate}">
-                                book
-                            </a>
-                        </th>
-                    </c:otherwise>
-                </c:choose>
+                <c:if test="${user.role.name == 'client'}">
+                    <c:choose>
+                        <c:when test="${busyEstateMap[property.id] eq true}">
+                            <th>busy</th>
+                        </c:when>
+                        <c:otherwise>
+                            <th>
+                                <a href="/propertyById/${property.id}?arrivalDate=${arrivalDate}&departureDate=${departureDate}">
+                                    book
+                                </a>
+                            </th>
+                        </c:otherwise>
+                    </c:choose>
+                </c:if>
             </tr>
         </c:forEach>
         </tbody>

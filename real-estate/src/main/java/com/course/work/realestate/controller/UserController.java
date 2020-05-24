@@ -74,8 +74,6 @@ public class UserController {
         ModelAndView modelAndView = new ModelAndView("redirect:/logIn");
         if (user != null && user.getPassword().equals(password)) {
             request.getSession().setAttribute("user", user);
-            //Cookie cookie = new Cookie("user2", "kkkjm");
-            //response.addCookie(cookie);
             System.out.println(request.getSession().getAttribute("user"));
             request.getSession().setMaxInactiveInterval(60 * 10);
             return modelAndView;

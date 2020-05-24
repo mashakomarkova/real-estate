@@ -3,7 +3,7 @@
 
 <html>
 <head>
-    <title>#[[$Title$]]#</title>
+    <title>Not found</title>
 </head>
 <body>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>

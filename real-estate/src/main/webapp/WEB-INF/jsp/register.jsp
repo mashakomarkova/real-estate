@@ -5,7 +5,7 @@
 
 <html>
 <head>
-    <title>#[[$Title$]]#</title>
+    <title>Register</title>
 </head>
 <body>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>

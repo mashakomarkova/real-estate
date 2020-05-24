@@ -5,7 +5,7 @@
 
 <html>
 <head>
-    <title>#[[$Title$]]#</title>
+    <title>Main</title>
 </head>
 <body>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
@@ -19,13 +19,13 @@
                 <input class="form-control" type="password" name="password" placeholder="Enter password"/>
             </div>
             <button class="btn btn-primary">Log in</button>
-            <p>${incorrectCredentials}</p>
         </form>
+        <p class="text-danger">${incorrectCredentials}</p>
     </c:if>
     <c:if test="${not empty user}">
         <div class="card text-center">
             <div class="card-header">
-                Здравствуйте, ${user.firstName}
+                ${user.firstName} - ${user.role.name}
             </div>
             <div class="card-body">
                 <h5 class="card-title">Никнейм - ${user.username}</h5>

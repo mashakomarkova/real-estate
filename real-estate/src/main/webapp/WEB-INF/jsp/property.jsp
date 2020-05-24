@@ -5,7 +5,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-    <title>#[[$Title$]]#</title>
+    <title>Property</title>
 </head>
 <body>
 <%@ include file="/WEB-INF/jspf/header.jspf" %>
